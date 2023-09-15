@@ -65,38 +65,58 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  var userReview = req.params.Review;
+  var userReview = req.query.Review;
   if(isNullOrEmpty(userReview) === true){
     return res.status(300).json({message: "Review is missing!"});
   }
   var id = req.params.isbn;
-  if(isNullOrEmpty(userReview) === true){
+  if(isNullOrEmpty(id) === true){
     return res.status(300).json({message: "isbn is missing!"});
   }
-  var username = req.authorization['username'];
-  if(isNullOrEmpty(userReview) === true){
+  var username = req.session.authorization['username'];
+  if(isNullOrEmpty(username) === true){
     return res.status(300).json({message: "username authorization is missing!"});
   }
   var reviews = books[id].reviews;
-  if(isNullOrEmpty(userReview) === true){
+  if(isNullOrEmpty(JSON.stringify(reviews)) === true){
     return res.status(300).json({message: "Book not found!"});
   }
-
-        var existingReview = reviews.find(rv => rv.username === username);
-        
-        if(!existingReview)
-        {
-            reviews.push({"username" : username, "review" : userReview});
-            return res.status(300).json({message: "User Review with username " + username + " successfully added/updated"});
-        }
-        else
-        {
-            existingReview = {"username" : username, "review" : userReview};
-            return res.status(300).json({message: "User Review with username " + username + " successfully added/updated"});
-        }
+  
+    // if(reviews.hasOwnProperty(username))
+    // {
+        reviews[username] = userReview;
+        return res.status(300).json({message: username + "'s review is added/updated!"});
+    // }
+    
     
 
 });
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+
+    var id = req.params.isbn;
+    if(isNullOrEmpty(id) === true){
+      return res.status(300).json({message: "isbn is missing!"});
+    }
+    var username = req.session.authorization['username'];
+    if(isNullOrEmpty(username) === true){
+      return res.status(300).json({message: "username authorization is missing!"});
+    }
+    var reviews = books[id].reviews;
+    if(isNullOrEmpty(JSON.stringify(reviews)) === true){
+      return res.status(300).json({message: "Book not found!"});
+    }
+    
+    if(reviews.hasOwnProperty(username))
+    {
+        const reviewErased = reviews[username];
+        delete reviews[username];
+        return res.status(300).json({message: username + "'s review { " + reviewErased + " } is deleted!"});
+    }
+      
+      
+  
+  });
 
 
 
