@@ -19,9 +19,9 @@ public_users.post("/register", (req,res) => {
     
         if(isNullOrEmpty(username) === false && isNullOrEmpty(password) === false){
             if(isValid(username) === true){
-                var newUser = {"username": username, "username": username};
+                var newUser = {"username": username, "password": password};
                 users.push(newUser);
-                return res.status(300).json({message: "User added successfully!"});
+                return res.status(300).json({message: "User " + newUser + " added successfully!"});
             }
             return res.status(300).json({message: "Username already exists!"});
 
