@@ -50,7 +50,7 @@ regd_users.post("/login", (req,res) => {
                 req.session.authorization = {
                     accessToken,username
                 }
-                
+
                 return res.status(300).json({message: "User logged in!"});
             }
             else
@@ -65,9 +65,40 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  var userReview = req.params.Review;
+  if(isNullOrEmpty(userReview) === true){
+    return res.status(300).json({message: "Review is missing!"});
+  }
+  var id = req.params.isbn;
+  if(isNullOrEmpty(userReview) === true){
+    return res.status(300).json({message: "isbn is missing!"});
+  }
+  var username = req.authorization['username'];
+  if(isNullOrEmpty(userReview) === true){
+    return res.status(300).json({message: "username authorization is missing!"});
+  }
+  var reviews = books[id].reviews;
+  if(isNullOrEmpty(userReview) === true){
+    return res.status(300).json({message: "Book not found!"});
+  }
+
+        var existingReview = reviews.find(rv => rv.username === username);
+        
+        if(!existingReview)
+        {
+            reviews.push({"username" : username, "review" : userReview});
+            return res.status(300).json({message: "User Review with username " + username + " successfully added/updated"});
+        }
+        else
+        {
+            existingReview = {"username" : username, "review" : userReview};
+            return res.status(300).json({message: "User Review with username " + username + " successfully added/updated"});
+        }
+    
+
 });
+
+
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
