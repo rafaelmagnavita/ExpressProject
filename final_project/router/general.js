@@ -38,20 +38,26 @@ public_users.get('/',function (req, res) {
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
   var id = req.params.isbn;
   var book = books[id];
-  return res.status(300).json(book);
+  if(book === undefined || book === null)
+  {
+    return res.status(300).json("Book Not Found!");
+  }
+  return res.status(200).json(book);
 });
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
     var author = req.params.author;
+    if((author) === null || author === undefined){
+        return res.status(300).json({message: "No Author Input Value"});
+    }
     for (const key in books) {
         if(books[key].author === author)
-        return res.status(300).json(books[key]);
+        return res.status(200).json(books[key]);
     }
-    return res.status(300).json({message: "Author not found"});
+    return res.status(200).json({message: "Author not found"});
 
 });
 
@@ -89,9 +95,46 @@ public_users.get('/books', async (req, res) => {
     myPromise.then((successMessage) => {
         return res.status(200).json(successMessage);
     });
-
-
 });
   
+public_users.get('/asyncisbn/:isbn', async (req, res) => {
+    var id = req.params.isbn;
+
+    let myPromise = new Promise((resolve,reject) => {
+       axios
+      .get('https://rafaelmagnav-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/isbn/' + id)
+      .then((response) => {
+        const books = response.data;
+        return resolve(books);
+      })
+      .catch((error) => {
+        return reject;
+      });
+    });
+
+    myPromise.then((successMessage) => {
+        return res.status(200).json(successMessage);
+    });
+});
+
+public_users.get('/asyncauthor/:author', async (req, res) => {
+    var author = req.params.author;
+
+    let myPromise = new Promise((resolve,reject) => {
+       axios
+      .get('https://rafaelmagnav-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/author/' + author)
+      .then((response) => {
+        const books = response.data;
+        return resolve(books);
+      })
+      .catch((error) => {
+        return reject;
+      });
+    });
+
+    myPromise.then((successMessage) => {
+        return res.status(200).json(successMessage);
+    });
+});
 
 module.exports.general = public_users;
