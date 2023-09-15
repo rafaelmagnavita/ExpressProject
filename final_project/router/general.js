@@ -55,7 +55,9 @@ public_users.get('/author/:author',function (req, res) {
     }
     for (const key in books) {
         if(books[key].author === author)
+        {
         return res.status(200).json(books[key]);
+        }
     }
     return res.status(200).json({message: "Author not found"});
 
@@ -64,9 +66,14 @@ public_users.get('/author/:author',function (req, res) {
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
     var title = req.params.title;
+    if((title) === null || title === undefined){
+        return res.status(300).json({message: "No title Input Value"});
+    }
     for (const key in books) {
         if(books[key].title === title)
-        return res.status(300).json(books[key]);
+        {
+            return res.status(200).json(books[key]);
+        }
     }
     return res.status(300).json({message: "Title not found"});
 });
@@ -123,6 +130,26 @@ public_users.get('/asyncauthor/:author', async (req, res) => {
     let myPromise = new Promise((resolve,reject) => {
        axios
       .get('https://rafaelmagnav-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/author/' + author)
+      .then((response) => {
+        const books = response.data;
+        return resolve(books);
+      })
+      .catch((error) => {
+        return reject;
+      });
+    });
+
+    myPromise.then((successMessage) => {
+        return res.status(200).json(successMessage);
+    });
+});
+
+public_users.get('/asynctitle/:title', async (req, res) => {
+    var title = req.params.title;
+
+    let myPromise = new Promise((resolve,reject) => {
+       axios
+      .get('https://rafaelmagnav-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/title/' + title)
       .then((response) => {
         const books = response.data;
         return resolve(books);
