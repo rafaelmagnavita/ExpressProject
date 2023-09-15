@@ -1,5 +1,6 @@
 const express = require('express');
 let books = require("./booksdb.js");
+const axios = require('axios');
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
@@ -32,7 +33,7 @@ public_users.post("/register", (req,res) => {
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-    return res.status(300).json(books);
+    return res.status(200).json(books);
 });
 
 // Get book details based on ISBN
@@ -70,5 +71,27 @@ public_users.get('/review/:isbn',function (req, res) {
     var book = books[id].reviews;
     return res.status(300).json(book);
 });
+
+
+public_users.get('/books', async (req, res) => {
+    let myPromise = new Promise((resolve,reject) => {
+       axios
+      .get('https://rafaelmagnav-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/')
+      .then((response) => {
+        const books = response.data;
+        return resolve(books);
+      })
+      .catch((error) => {
+        return reject;
+      });
+    });
+
+    myPromise.then((successMessage) => {
+        return res.status(200).json(successMessage);
+    });
+
+
+});
+  
 
 module.exports.general = public_users;
