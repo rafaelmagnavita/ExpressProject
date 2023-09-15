@@ -44,6 +44,13 @@ regd_users.post("/login", (req,res) => {
         if(isNullOrEmpty(username) === false && isNullOrEmpty(password) === false){
             if(authenticatedUser(username,password) === true)
             {
+                let accessToken = jwt.sign({
+                    data: password
+                }, 'access', { expiresIn: 60 * 60 });
+                req.session.authorization = {
+                    accessToken,username
+                }
+                
                 return res.status(300).json({message: "User logged in!"});
             }
             else
